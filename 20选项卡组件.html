@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<style type="text/css">
+		#div1 div,#div2 div,#div3 div,#div4 div {width:200px;height:200px;border:1px #000 solid;display: none;}
+		.active {background: red;}
+	</style>
+	<script src="js/jquery-1.11.0.min.js"></script>
+	<script>
+		/**
+			title : 基于JQ的选项卡组件
+			options : 配置参数
+				event : 触发事件，默认click
+				delay : 切换选项卡的延迟，默认 0
+			
+			Methods : 方法  // 方法和配置参数 没有太严格的区分，其实这里的 nowSel也可以弄成配置参数，而不是事件，没有严格解析，看自己习惯
+				nowSel() : 设置默认选项卡起始位置（即第几个选项卡显示
+				getContent() : 获取当前选项卡内容、
+			
+			Events:自定义事件
+				beforeClick : 点击前触发
+				afterClick :  点击后触发
+				
+		 */
+		 //JQ中的主动触发方法: trigger()
+		
+		$(function(){
+			var t1 = new Tab();
+			t1.init('div1',{});
+			
+			var t2 = new Tab();
+			t2.init('div2',{
+				event:'mouseover'
+			});
+			
+			var t3 = new Tab();
+			t3.init('div3',{
+				event:'mouseover',
+				delay:200
+			});
+			
+			var t4 = new Tab();
+			t4.init('div4',{});
+			t4.nowSel(2); // 初始是第3个选项卡显示
+			
+			// 点击inut1,弹出当前选项卡内容
+			$("#input1").click(function(){
+				t4.getContent();
+			});
+			
+			// 在jquery中,t4是对象,不能直接加on,要用 $ 包裹一下才能加on
+			$(t4).on('beforeClick',function(){
+				// 点击前弹一下当前选项卡内容
+				alert(t4.getContent());
+			});
+			
+			$(t4).on('afterClick',function(){
+				// 点击后弹一下当前选项卡内容
+				alert(t4.getContent());
+			});
+			
+		});
+		function Tab(){
+			
+			this.oParent = null;
+			this.aInput = null;
+			this.aDiv = null;
+			this.iNow = 0;
+			
+			this.settings = {  // 默认参数
+				event : 'click',
+				delay:0
+			}
+		}
+		Tab.prototype.init = function(oParent,opt){
+			$.extend( this.settings,opt );
+			
+			this.oParent = $('#'+oParent);
+			this.aInput = this.oParent.find('input');
+			this.aDiv = this.oParent.find('div');
+			
+			this.change();
+		};
+		Tab.prototype.change = function(){
+			
+			var This = this;
+			var timer = null;
+			this.aInput.on(this.settings.event,function(){
+				
+				var _this = this;
+				
+				if(This.settings.event == 'mouseover' && This.settings.delay ){
+					
+					timer = setTimeout(function(){
+						show(_this);
+					},This.settings.delay)		
+				}else {
+					show(this);
+				}
+				
+				
+			}).mouseout(function(){
+				clearTimeout(timer);
+			});
+			
+			function show(obj){
+				
+				$(This).trigger('beforeClick'); // 主动触发事件
+				
+				This.aInput.attr('class','');
+				This.aDiv.css("display",'none');
+				
+				$(obj).attr('class','active');
+				
+				This.aDiv.eq( $(obj).index() ).css("display",'block');
+				
+				This.iNow = $(this).index();
+				
+				$(This).trigger('afterClick');  // 主动触发事件
+			}
+		};
+		
+		Tab.prototype.nowSel = function(index){
+			
+			this.aInput.attr('class','');
+			this.aDiv.css("display",'none');
+			
+			this.aInput.eq(index).attr('class','active');
+			this.aDiv.eq(index ).css("display",'block');
+			
+			this.iNow = index;
+		}
+		
+		// 获取当前选项卡内容
+		Tab.prototype.getContent = function(){
+			return this.aDiv.eq(this.iNow).html();
+		}
+		
+	</script>
+</head>
+
+<body>
+	<div id="div1">
+		<input class="active" type="button" value="1">
+		<input type="button" value="2">
+		<input type="button" value="3">
+		<div style="display: block;">1111</div>
+		<div>222</div>
+		<div>333</div>
+	</div>
+	
+	<div id="div2">
+		<input class="active" type="button" value="1">
+		<input type="button" value="2">
+		<input type="button" value="3">
+		<div style="display: block;">1111</div>
+		<div>222</div>
+		<div>333</div>
+	</div>
+	
+	<div id="div3">
+		<input class="active" type="button" value="1">
+		<input type="button" value="2">
+		<input type="button" value="3">
+		<div style="display: block;">1111</div>
+		<div>222</div>
+		<div>333</div>
+	</div>
+	
+	<div id="div4">
+		<input class="active" type="button" value="1">
+		<input type="button" value="2">
+		<input type="button" value="3">
+		<div style="display: block;">1111</div>
+		<div>222</div>
+		<div>333</div>
+	</div>
+	
+	<input type="button" value="点击" id="input1">
+</body>
+
+</html>

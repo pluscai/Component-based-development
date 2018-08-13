@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		var str = 'hello';
+		//alert(typeof str); // string
+		str.charAt(0);
+		str.indexOf('e');
+		
+		/*
+			思考：为什么基本类型的string能够调用方法呢？ 在JS程序中，只有对象才有属性和方法，基本类型并没有
+				包装对象：基本类型都有自己对象的包装对象（除了null和undefined）:String Number Boolean
+					这个包装对象 就是 构造函数 如Array Date这样的
+		*/
+		
+		var str1 = new String('hello');
+		//alert(typeof str1);  // Object
+		//alert(str1.charAt(1)); // e
+		
+		//String.prototype.charAt = function(){} // chartAt方法是挂载在string的包装对象上的
+		
+		// 下面分析下 基本类型-包装类型的转换过程
+		var str2 = 'hello';
+		//str2.charAt(0); // 基本类型会找到对应的包装对象类型,然后包装对象把所有的属性和方法给了基本类型,然后包装对象消失
+		
+		// 自己写一个字符串的方法-比如找出字符串最后一个字符的方法,权且叫lastValue
+		var str3 = 'hello';
+		String.prototype.lastValue = function(){
+			return this.charAt(this.length-1);
+		}
+		alert(str3.lastValue());  // o
+		
+		// 懂了基本类型 - 包装类型之间的工作原理后,思考以下代码的输出是什么？
+		var str4 = 'hello';
+		str4.num = 10;
+		alert(str4.num);  // undefined
+		// 分析: str4.num = 10 这句话基本类型会找到对应的包装类型 String,然后在这个构造函数上挂载一个属性 num=10,随后包装对象消失
+		//  紧接着 alert(str4.num); str4会再次寻找对应的包装类型（注意这次的包装对象 是新的，每次找包装对象都是新的，因为之前的包装对象在用完就消失了） String,
+			// 并打印出 String构造函数中的属性num,但是String构造函数中没有num属性,所以打印出undefined
+		
+		
+	</script>
+</body>
+
+</html>

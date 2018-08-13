@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<style type="text/css">
+		#div1 {width:100px;height:100px;background:red;position: absolute;}
+		#div2 {width:100px;height:100px;background:yellow;position: absolute;left:100px}
+		#div3 {width:100px;height:100px;background:blue;position: absolute;left:200px}
+		#div4 {width:100px;height:100px;background:green;position: absolute;left:300px}
+	</style>
+	<script type="text/javascript">
+		window.onload = function(){
+			// 表现形式1: 正常的拖拽
+			var d1 = new Drag();
+			d1.init({  // 配置参数
+				id : 'div1'
+			});
+			
+			// 表现形式2: 拖拽时,鼠标按下 显示hello
+			var d2 = new Drag();
+			d2.init({   // 配置参数
+				id : 'div2',
+				/* toDown : function(){  // 改成如下的自定义事件
+					document.title = 'hello';   
+				} */
+			});
+			
+			bindEvent(d2,'toDown',function(){
+				document.title = 'hello';
+			});
+			
+			// 表现形式3: 拖拽时,鼠标按下 显示hello, 鼠标抬起,显示world
+			var d3 = new Drag();
+			d3.init({  // 配置参数
+				id : 'div3',
+				/* toDown : function(){   // 改成如下的自定义事件
+					document.title = 'hello';
+				},
+				toUp : function(){
+					document.title = 'world';
+				} */
+			});
+			
+			bindEvent(d3,'toDown',function(){
+				document.title = 'hello';
+			});
+			
+			bindEvent(d3,'toUp',function(){
+				document.title = 'world';
+			});
+			
+			
+			
+			// 表现形式4: 拖拽时,鼠标抬起,显示 byebye
+			var d4 = new Drag();
+			d4.init({  // 配置参数
+				id : 'div4',
+				/* toUp : function(){  //改成如下的自定义事件
+					document.title = 'byebye';
+				} */
+			});
+			bindEvent(d4,'toUp',function(){
+				document.title = 'byebye';
+			});
+		}
+		
+		function Drag(id){
+			this.obj = null;
+			this.disX = 0;
+			this.disY = 0;
+			
+			this.settings = {  // 默认参数
+				/* toDown : function(){},
+				toUp : function(){} */
+			}
+		}
+		Drag.prototype.init = function(opt){ 
+			var This = this;
+			
+			this.obj = document.getElementById(opt.id);
+			
+			extend(this.settings,opt);
+			
+			this.obj.onmousedown = function(ev){
+				var ev = ev || window.event;
+				This.fnDown(ev);
+				
+				fireEvent(This,'toDown'); // 主动触发自定义函数
+				//This.settings.toDown();
+				document.onmousemove = function(ev){
+					var ev = ev || window.event;
+					This.fnMove(ev);
+				};
+				document.onmouseup = function(){
+					This.fnUp();
+					
+					fireEvent(This,'toUp');  // 主动触发自定义函数
+					//This.settings.toUp();
+				};
+			};
+			
+			return false;
+		}
+		
+		Drag.prototype.fnDown = function(ev){
+			this.disX = ev.clientX = this.obj.offsetLeft;
+			this.disY = ev.clientY = this.obj.offsetTop;
+		}
+		Drag.prototype.fnMove = function(ev){
+			this.obj.style.left = ev.clientX-this.disX+'px';
+			this.obj.style.top = ev.clientY-this.disY+'px';
+		}
+		
+		Drag.prototype.fnUp = function () {
+			document.onmousemove = null;
+			document.onmouseup = null;
+		}
+		
+		function bindEvent(obj,events,fn){
+			// 可以用图书馆做个类比,将对象和时间进行映射
+			// obj:楼层
+			// events : 书架
+			// fn : 一本书
+			
+			obj.listeners = obj.listeners || {};
+			obj.listeners[events] = obj.listeners[events] || [];
+			
+			obj.listeners[events].push(fn);
+			
+			if(obj.nodeType){  // 判断是否是dom元素,是dom元素才执行
+				if(obj.addEventListener){
+					obj.addEventListener(events,fn,false);
+				}
+				else {
+					obj.attachEvent('on'+events,fn);
+				}
+			}
+			
+		}
+		
+		function fireEvent(obj,events){  // 主动触发自定义事件
+			if(obj.listeners && obj.listeners[events]){
+				for(var i=0; i < obj.listeners[events].length;i++){
+					obj.listeners[events][i]();
+				}
+			}
+			
+		}
+		function extend(obj1,obj2){
+			for(var attr in obj2){
+				obj1[attr] = obj2[attr];
+			}
+		}
+			
+	</script>
+</head>
+
+<body>
+	<div id="div1"></div>
+	<div id="div2"></div>
+	<div id="div3"></div>
+	<div id="div4"></div>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		function Aaa() {
+			this.name = '小明';
+		}
+		Aaa.prototype.showName = function () {
+			alert(this.name);
+		};
+		var a1 = new Aaa();
+		a1.showName();
+
+		var arr = new Array();
+		arr.push();
+		arr.sort();
+		/*
+		比较上述的 new Aaa() 和 new Array()， 可以发现， js的系统自带的对象之一数组应该也是基于原型的程序
+		在JS源码中： 系统对象也是基于原型的程序
+		可以想象， array的源码如下：
+		function Array() {   // .....
+		}
+		Array.prototype.push = function () {}
+		Array.prototype.sort = function () {}
+		可以做个试验：
+		*/
+		
+		var arr1 = [1,2,3];
+		Array.prototype.push = function(){};
+		arr1.push(4,5,6);
+		alert(arr1);  // 1 2 3 并不会弹出123456,因为array的push方法被复写掉了
+		
+		// 由上实验:尽量不要去修改或者添加系统对象下面的方法和属性
+		
+		// 下面我们自写一个数组的push方法
+		var arr3 = [1,2,3];
+		Array.prototype.push = function(){
+			//this: 1 2 3
+			//arguments:4,5,5
+			for(var i=0;i<arguments.length;i++){
+				this[this.length] = arguments[i]
+			}
+		}
+		arr3.push(4,5,6);
+		alert(arr3); // 1 2 3 4 5 6 这样我们就实现了系统数组对象的push方法
+	</script>
+</body>
+
+</html>

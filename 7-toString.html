@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		// toString()
+		// 1)
+		// toString(),系统对象(如Array)下面都是自带的 toString, 而自己写的对象都是通过原型链找 Object下面的 toString,Demo如下
+		var arr = [];
+		//alert(arr.toString == Object.prototype.toString); // false -- 系统对象自带toString
+		
+		function Aaa(){}
+		var a1 = new Aaa();
+		//alert(a1.toString == Object.prototype.toString); // true  -- 自己写的对象是通过原型链找 Object下的toString
+		
+		// 2)
+		// toString() 把对象转成字符串
+		var arr2 = [1,2,3];
+		//alert(arr2.toString()); // '1,2,3'
+		// 当然如果我们不想要 '1,2,3'这种字符串格式,而想要 '1-2-3',可以自己改写toString,如下
+		Array.prototype.toString = function(){
+			return this.join('-')
+		}
+		//alert(arr2.toString()); // '1-2-3'
+		
+		
+		// 3)
+		// toString() 用来进制转换
+		var num = 255;
+		//alert(num.toString(16));  // 'ff' -将255转成16进制了的 ff 
+		
+		
+		// 4)
+		// toString() 做类型的判断  -- 最好的判断类型的方式
+		var arr4 = [];
+		var aa = {}; 
+		var bb = new Date();
+		var cc = new RegExp();    
+		/*
+		alert(Object.prototype.toString.call(arr4));  // '[object Array]'  -- 这里的call是改变了toString方法中this的指向,指向了arr
+		alert(Object.prototype.toString.call(aa)); // '[object Object]'
+		alert(Object.prototype.toString.call(bb)); // '[object Date]'
+		alert(Object.prototype.toString.call(cc)); // '[object RegExp]'
+		*/
+		
+		// 在一般情况下,用 instanceof(对象与构造函数在原型链上是否有关系) constructor(查看对象的构造函数) 
+		 // 用这两个来判断对象类型就足够了,但是在特殊很少遇到的情境下会有问题
+		 window.onload = function(){
+			 
+			 var oF = document.createElement('iframe');
+			 document.body.appendChild(oF);
+			 
+			 var ifArray = window.frames[0].Array;
+			 var arr5 = new ifArray();
+			 
+			 alert(arr5.constructor == Array); // false
+			 alert(arr5 instanceof Array); // false
+			 
+			 alert(Object.prototype.toString.call(arr5) == '[object Array]'); // true
+			 // 由上面 3 个alert可知,在这种iframe特殊情况下,只有 用toString才能判断出arr5的类型
+		 }
+	</script>
+</body>
+
+</html>

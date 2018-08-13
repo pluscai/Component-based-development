@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		// 继承 -- 继承是复用代码的一种方式(函数跟后面讲的组件开发也是为了达到复用代码的目的)
+			// 子类不影响父类,子类可以继承父类的一些功能(代码复用)
+		
+		function CreatePerson(name,sex){   // 父类
+			this.name = name;
+			this.sex = sex;
+		}
+		CreatePerson.prototype.showName = function(){
+			alert(this.name);
+		}
+		var p1 = new CreatePerson('小明','男');
+		//p1.showName(); // 小明
+		
+		// 上面我们定义了一个父类,接着,我们再来定义一个子类
+		/*function CreateStar(name,sex,job){          // 子类
+			this.name = name;
+			this.sex = sex;
+			this.job = job;
+		}
+		CreateStar.prototype.showName = function(){
+			alert(this.name);
+		}
+		CreateStar.prototype.showJob = function(){
+			alert(this.job);
+		}
+		var p2 = new CreateStar('黄晓明','男','演员');
+		p2.showJob();  // 演员
+		p2.showName(); // 黄晓明
+		*/
+		
+		// 那么子类的两个属性 name,sex和一个方法showName是和父类中一样的,怎么把父类的属性和方法继承过来,复用代码呢？
+			
+		// > 1.属性的继承 -- 调用父类的构造函数 call
+		
+		function CreateStar(name,sex,job){          // 子类
+			/* this.name = name;
+			this.sex = sex; */
+			
+			// a.将父类的构造函数在这里执行以下,就可以得到父类构造函数里的 this.name = name;this.sex = sex 了
+			//CreatePerson(name,sex); 
+			
+			//b. 问题来了,父类构造CreatePerson在这里执行的时候,函数里的this指向谁呢？
+				// 分析可以,CreatePerson()这个函数直接直接,前面没有对象也没有new,那么函数里的this指向是window,
+				// 而实际我们想让 父类CreatePerson构造函数的this跟 子类CreateStar中的this保持一致,所以使用call改下this指向,如下
+			CreatePerson.call(this,name,sex); 	
+			this.job = job;
+		}
+		CreateStar.prototype.showName = function(){
+			alert(this.name);
+		}
+		CreateStar.prototype.showJob = function(){
+			alert(this.job);
+		}
+		var p2 = new CreateStar('黄晓明','男','演员');
+		p2.showJob();  // 演员
+		p2.showName(); // 黄晓明
+		
+		
+		// > 2.方法的继承
+			// 首先方法的继承 目的就是子类拥有父类的方法
+			// 我们首先想到的就是将父类的原型直接赋给子类的原型,如下
+			CreateStar.prototype = CreatePerson.prototype;
+			// 这样子类就可以直接用父类原型里的所有方法了
+			// 但是有个问题，子类继承的时候不能影响到父类，但由于是对象的引用，改变子类原型的里的方法，也会影响到父类
+			// 对象的引用是将对象的引用赋值，但是都是指向同一片内存空间
+			// 所以子类继承父类，最好是对父类原型对象的复制,而不是引用.怎么复制呢,下面讲哦.
+			
+			
+	</script>
+</body>
+
+</html>

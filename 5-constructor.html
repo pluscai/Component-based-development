@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		//1)
+		// constructor:查看对象的构造函数
+		function Aaa(){
+			
+		}
+		var a1 = new Aaa();
+		
+		//alert(a1.constructor); // Aaa
+		
+		var arr = [];
+		//alert(arr.constructor == Array); // true
+		
+		
+		//2)
+		// 当我们写了一个函数,系统会自动添加一段代码: Aaa.prototype.constructor = Aaa()
+		function Aaa2(){
+			
+		}
+		//Aaa2.prototype.constructor = Aaa2; 
+		// 上面这句话其实不用写,系统会自动帮我们带上,每一个函数都会有的,都是自动生成的
+		
+		// 当然我们也可以改 Aaa2.prototype.constructror的指向,从而覆盖掉系统自己加上的constructor属性的值
+		var a2 = new Aaa2();
+		Aaa2.prototype.constructor = Array;
+		//alert(a2.constructor);  // Array
+		
+		// 思考 每个对象都有hasOwnProperty方法,那么这个方法是系统帮我们自动加给对象的么？
+			// 通过下面的代码,我们可以知道,hasOwnProperty这个方法是继承的Object的原型的
+		//alert(a2.hasOwnProperty == Object.prototype.hasOwnProperty); // true
+		
+		
+		
+		//3)
+		// 避免修改原型的 constructor属性,但是我们有时在不经意之间会改掉,如下demo
+		/*function Aaa3(){}
+		Aaa3.prototype.name='小明';
+		Aaa3.prototype.age = 20;
+		
+		var a3 = new Aaa3();
+		alert(a3.constructor) // Aaa3*/
+		
+		function Aaa3(){}
+		Aaa3.prototype = {
+			name:'小明',
+			age:20
+		}
+		
+		var a3 = new Aaa3();
+		//alert(a3.constructor) // Object
+		
+		// 为什么下面这段代码的alert的是 Object呢？
+			// 分析.我们创建了一个函数 Aaa3,系统自动带上这段代码:
+			// Aaa3.prototype.constructro = Aaa3  -- 系统自己加的
+			// 上面代码的 Aaa3.prototype.name = '小明' ,只是为 Arr3.prototype添加了一个name属性而已
+			// 而下面的  Aaa3.prototype = {},其实是为 Aaa3.prototype这个对象重新赋值了,原来挂载在原型上的属性和方法被覆盖了
+			// 所以 下面的 alert a3.constructor 沿着原型链,在原型里没找到constructro属性,最终找到的是Object.prototype的constructor属性(Object.prototype.constructor = Object）)
+		
+		// 所以,如果一定要用对象的简写形式(即 Aaa3.protorype={}),为原型添加多个属性,可以在{}中加 constructor属性,如下:
+		/*function Aaa3(){}
+		Aaa3.prototype = {
+			constructor:Aaa3,  // 加上这行代码
+			name:'小明',
+			age:20
+		}
+		
+		var a3 = new Aaa3();
+		alert(a3.constructor) // Object*/
+		
+		
+		//4)
+		// For in的时候（遍历原型属性）,系统自己带上去的属性是遍历不到的
+		function Aaa4(){};
+		Aaa4.prototype.name = 10;
+		Aaa4.prototype.constructor = Aaa4;  // 即使我们自己重写了 constructor属性,for..in还是遍历不到
+		
+		for(var attr in Aaa4.prototype){
+			alert(attr)  // name
+		}
+		
+	</script>
+</body>
+
+</html>

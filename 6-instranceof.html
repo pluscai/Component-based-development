@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		// instanceof : 对象与构造函数在原型链上是否有关系
+		
+		function Aaa(){}
+		var a1 = new Aaa();
+		alert( a1 instanceof Aaa); // true
+		alert( a1 instanceof Array); // false
+		
+		// instanceof:可以用来做对象的类型的判断,但是对象类型判断的最好的方法是下节要将的toString方法
+		var arr = [];
+		alert(arr instanceof Array); // true
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		// 上节谈到,如何进行对象对象的复制而不是对象的引用
+		// 我们先来看个例子:
+		/*var a = {
+			name:'小明'
+		};
+		var b = {
+			name:'小强'
+		}
+		a = b;
+		alert(a.name); // 小强 这里是对象的引用,b对象的引用赋给了a对象,a现在就指向b对象的内存空间了,所以打印的是小强
+		*/
+		// 实际我们想要的是对象的复制,即 打印 a.name应该等于 小明
+		// 我们知道像字符串 数字 这些基本数据类型,是直接赋值,直接复制值,那么我们不要 b=a 这种对象的引用的复制,而是直接 
+		// b.name = a.name，因为两边都是字符串数据类型 这样来,这样b既可以继承 a的name的值,同时 b再重新修改值,也不会影响到a.name,
+		var a = {
+			name:'小明'
+		};
+		var b = {};
+		for(var attr in a){
+			b[attr] = a[attr]
+		}	
+		//extend(b,a);  // 调用extend方法
+		b.name = '小青';//这里直接修改b.name,也不会影响到 a.name的值
+		alert(b.name); // 小青
+		
+		// 我们可以写一个方法extend,专门用来进行对象的复制,调用方法如上注释部分代码
+		function extend(obj1,obj2){
+			for(var attr in obj2){
+				obj1[attr] = obj2[attr];
+			}
+		}
+		
+		// 因此上节的对象的复制,可以写成如下:
+		function CreatePerson(name,sex){   // 父类
+			this.name = name;
+			this.sex = sex;
+		}
+		CreatePerson.prototype.showName = function(){
+			alert(this.name);
+		}
+		var p1 = new CreatePerson('小明','男');
+		
+		
+		
+		function CreateStar(name,sex,job){          // 子类
+			CreatePerson.call(this,name,sex);
+			this.job = job;
+		}
+		extend(CreateStar.prototype,CreatePerson.prototype); // 这里 进行了对象的复制拷贝
+		CreateStar.prototype.showJob = function(){
+			alert(this.job);
+		}
+		var p2 = new CreateStar('黄晓明','男','演员');
+		
+		p2.showJob();  // 演员
+		p2.showName(); // 黄晓明
+		
+		
+		// 至此,继承中的方法的继承就ok了,
+		// 可能有同学有疑问,把CreatePerson.prototype里的方法复制给CreateStar.prototype对象,这里还是有对象的引用啊
+		// 比如 CreateStar.prototype.showName = CreatePerson.prototype.showName = function(){alert(this.name)},这不是函数的赋值么,函数也是对象,也是
+		// 对象引用的赋值,那么 当我修改了 CreateStar.prototype.showName = function(){alert('我被修改了')},那么CreatePerson.prototype.showName会不会跟着变呢？
+		
+		// 其实不会的,因为函数时一个特殊的对象
+		var son = father =  function(){alert('哈哈')}; // 将 父类函数复制给son
+		var son = function(){alert('嘿嘿')}  // 这里子类son其实被重新赋值了，而与父类father的链接就断开了，不再跟b指向同一个内存空间，而被分配了一个新空间。
+		// 所以此时 son重新被赋值不会影响到father
+		son(); // 嘿嘿
+		father(); // 哈哈  -- 父类没有被影响.
+		
+		// 那么数组作为一种对象就跟 函数不同了,可看如下栗子
+		var aa = [1,2,3];
+		var bb = aa;
+		bb.push(4);
+		
+		alert(aa); // [1,2,3,4],因为bb.push(4),修改了内存空间里数组[1,2,3]的值,所以bb修改内存空间里的值,aa当然也就跟着被修改了,因为指向同一片内存空间
+		
+		var aaa = [1,2,3];
+		var bbb = aaa;
+		
+		bbb = [1,2,3,4]
+		
+		alert(aaa); //[1,2,3] ,此时aaa的值没有受到bbb的影响,因为bbb被重新赋值了(重新分配内存空间),就与原来的aaa指向的内存空间断开链接了,没有关系了.
+		
+		
+		
+		// 总结:函数是特殊的对象,当函数被重新赋值,也就是被重新分配一片内存空间了.
+			
+	</script>
+</body>
+
+</html>

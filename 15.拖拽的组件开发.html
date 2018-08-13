@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<style type="text/css">
+		#div1 {width:100px;height:100px;background:red;position: absolute;}
+		#div2 {width:100px;height:100px;background:yellow;position: absolute;left:100px}
+		#div3 {width:100px;height:100px;background:blue;position: absolute;left:200px}
+		#div4 {width:100px;height:100px;background:green;position: absolute;left:300px}
+	</style>
+	<script type="text/javascript">
+		// 组件开发 : 多组对象,像兄弟之间的关系,有不同的表现形式(功能一样，但是不同的表现形式，比如弹窗，功能都是显示弹出层，但是弹出的位置、弹框的宽高不一样，这就是不同的表现形式)
+			// 像上述这种情况就可以用组件开发
+			// 不必为同样功能的不同的状态都去写一套代码，这样可以节省代码,组件开发也是代码复用的一种形式.
+		
+		// 下面的例子是以拖拽元素的功能做演示
+			// 拖拽对象的功能都是一样的，区别就是各个拖拽时的表现形式不一样
+			// 为了模拟三个不同的状态,用鼠标按下 抬起时,document.title的不同来表示同的表现形式,对应下面4个拖拽对象,有4种表现形式
+		window.onload = function(){
+			// 表现形式1: 正常的拖拽
+			var d1 = new Drag();
+			//d1.init('div1');  // 改成如下参数配置形式
+			d1.init({  // 配置参数
+				id : 'div1'
+			});
+			
+			// 表现形式2: 拖拽时,鼠标按下 显示hello
+			var d2 = new Drag();
+			/* d2.init('div2',function(){  
+				document.title = 'hello';   
+			}); */
+			// 改成如下参数配置形式
+			d2.init({   // 配置参数
+				id : 'div2',
+				toDown : function(){
+					document.title = 'hello';   
+				}
+			});
+			
+			// 表现形式3: 拖拽时,鼠标按下 显示hello, 鼠标抬起,显示world
+			var d3 = new Drag();
+			/* d3.init('div3',function(){
+				document.title = 'hello'; 
+			},function(){
+				document.title = 'world'; 
+			}); */
+			// 改成如下参数配置形式
+			d3.init({  // 配置参数
+				id : 'div3',
+				toDown : function(){
+					document.title = 'hello';
+				},
+				toUp : function(){
+					document.title = 'world';
+				}
+			});
+			
+			
+			// 表现形式4: 拖拽时,鼠标抬起,显示 byebye
+			var d4 = new Drag();
+			/* d4.init('div4',function(){},function(){
+				document.title = 'byebye'; 
+			}); */
+			// 改成如下参数配置形式
+			d4.init({  // 配置参数
+				id : 'div4',
+				toUp : function(){
+					document.title = 'byebye';
+				}
+			});
+			
+			
+			// 实际4种表演形式的状态运行下来,会出现两个问题:
+				//1.当参数不写的情况下会报错
+					// 如d1对象,init函数里只有1个参数,实际运行需传入三个参数，id、toDown、toUp，这样就会报undefined错 
+				//2.当参数特别多的时候会出现参数顺序的问题
+					// 如d4对象,鼠标按下时没有函数与之对应,只有鼠标抬起时有,这时就要传入一个空函数作为占位
+					// 如果当 init里参数特别多的时候很容易混淆,出现参数顺序的问题
+			
+			// 那么如何解决这两个问题呢？这就引出了参数配置， 如何给拖拽组件配置不同参数？
+		}
+		
+		function Drag(id){
+			this.obj = null;
+			this.disX = 0;
+			this.disY = 0;
+			
+			this.settings = {  // 默认参数
+				toDown : function(){},
+				toUp : function(){}
+			}
+		}
+		Drag.prototype.init = function(opt){ 
+			var This = this;
+			
+			this.obj = document.getElementById(opt.id);
+			
+			extend(this.settings,opt);
+			
+			this.obj.onmousedown = function(ev){
+				var ev = ev || window.event;
+				This.fnDown(ev);
+				This.settings.toDown();
+				document.onmousemove = function(ev){
+					var ev = ev || window.event;
+					This.fnMove(ev);
+				};
+				document.onmouseup = function(){
+					This.fnUp();
+					
+					This.settings.toUp();
+				};
+			};
+			
+			return false;
+		}
+		
+		Drag.prototype.fnDown = function(ev){
+			this.disX = ev.clientX = this.obj.offsetLeft;
+			this.disY = ev.clientY = this.obj.offsetTop;
+		}
+		Drag.prototype.fnMove = function(ev){
+			this.obj.style.left = ev.clientX-this.disX+'px';
+			this.obj.style.top = ev.clientY-this.disY+'px';
+		}
+		
+		Drag.prototype.fnUp = function () {
+			document.onmousemove = null;
+			document.onmouseup = null;
+		}
+		function extend(obj1,obj2){
+			for(var attr in obj2){
+				obj1[attr] = obj2[attr];
+			}
+		}
+			
+	</script>
+</head>
+
+<body>
+	<div id="div1"></div>
+	<div id="div2"></div>
+	<div id="div3"></div>
+	<div id="div4"></div>
+</body>
+
+</html>

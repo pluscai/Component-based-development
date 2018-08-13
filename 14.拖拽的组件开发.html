@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+		// 问题1 
+		// 当参数特别多的时候会出现参数顺序的问题
+		// 解决这个问题可以利用对象的json格式的写法,如下:
+		var d2 = new Drag();
+		d2.init({
+			id:'div2',
+			toDown:function(){},
+			toUp:function(){}
+		});
+		
+		// 已对象json的格式传入参数,这样就一个参数，解决了参数顺序的问题，不同的配置对应参数对象里的不同的属性。
+		// 这样参数配置后传入init函数,用一个opt就行了,如下:
+		Drag.prototype.init = function(opt){ }
+		
+		
+		
+		// 问题2
+		//当参数不写的情况下会报错的问题 -- 设置默认参数 ,当有配置参数时,程序走配置参数,当没有配置参数时,程序走默认参数,这样即使配置参数里有参数没写,也不会报错
+		
+		// 关于配置参数
+		var setting = {  // 配置参数
+			name:'小明'
+		};
+		
+		var defaults = {  // 默认参数
+			name:'无名氏'
+		};
+		
+		alert(defaults.name); // 无名氏
+		// 问题:如何在alert(defaults.name)时,如何setting对象中配置了name,就用setting对象中的name属性,没有name属性就用默认的defaults里的name
+		
+		// 这里我们可以利用对象的拷贝,如下:
+		
+		// 对象的拷贝,将obj2对象进行拷贝赋给obj1
+		function extend(obj1,obj2){
+			for(var attr in obj2){
+				obj1[attr] = obj2[attr];
+			}
+		}
+		
+		extend( defaults , setting ); // 当setting里有name时,会将defaults里的name覆盖,当setting里没有name时,就用defautls里的name
+		alert(defaults.name); // 小明 此时由于setting中配置了name,所以打印的是setting中的name
+		
+		
+		// 组件开发中的参数配置就是用的这个原理
+		
+		
+		//解决了这两个问题,我们再对刚刚拖拽的组件进行修正
+		
+	</script>
+</body>
+
+</html>
